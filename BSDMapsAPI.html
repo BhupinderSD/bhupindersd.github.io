@@ -1,4 +1,7 @@
 <!DOCTYPE html> <!-- Declares HTML5 website -->
+<!-- Route from user's location to a fixed location (my school) -->
+<!-- Switch between transport modes -->
+<!-- Works on mobile devices -->
 <html>
 
   <head>
@@ -20,12 +23,12 @@
       #floating-panel {
         position: absolute; /*Element Positioned reelative to the first non static element*/
         top: 10px;
-        left: 190px;
+        left: 200px;
         z-index: 5;         /*Floating panel on front*/
         background-color: #fff;
         padding: 10px;
         border: 0px solid;
-        box-shadow: 1px 1px #bababa;
+        box-shadow: 1px 1px #bababa;  /*Gray shadow*/
         text-align: center;
         font-family: 'Roboto','sans-serif';
         height: 19.5px;
@@ -44,9 +47,9 @@
     Mode of Travel: 
     <select id="mode">
       <option>None</option>
-      <option value="DRIVING">Driving</option>
       <option value="WALKING">Walking</option>
-      <option value="TRANSIT">Transit</option>
+      <option value="DRIVING">Driving</option>
+      <option value="TRANSIT">Public Transport</option>
     </select>
     </div>
 
@@ -55,12 +58,6 @@
     <script>
 
 
-
-
-      // Note: This example requires that you consent to location sharing when
-      // prompted by your browser. If you see the error "The Geolocation service
-      // failed.", it means you probably did not give permission for the browser to
-      // locate you.
       var map, infoWindow;
       function initMap() {
         var directionsDisplay = new google.maps.DirectionsRenderer;
@@ -71,7 +68,6 @@
         });
         infoWindow = new google.maps.InfoWindow;
 
-        // Try HTML5 geolocation.
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(function(position) {
             pos = {
@@ -88,13 +84,11 @@
             handleLocationError(true, infoWindow, map.getCenter());
           });
         } else {
-          // Browser doesn't support Geolocation
           handleLocationError(false, infoWindow, map.getCenter());
         }
 
         directionsDisplay.setMap(map);
 
-      // calculateAndDisplayRoute(directionsService, directionsDisplay);
       document.getElementById('mode').addEventListener('change', function() {
         calculateAndDisplayRoute(directionsService, directionsDisplay, pos);
       });
