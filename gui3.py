@@ -70,11 +70,10 @@ class TopWindow:
 
         self.P1L1 = Label(self.Page1)
         self.P1L1.place(relx=0.01, rely=0.02, height=211, width=1874)
-        self.P1L1.configure(background="#0B0C10")               #Background colour
+        self.P1L1.configure(background="#0B0C10")               
         self.P1L1.configure(foreground="#c5c6c7")
         self.P1L1.configure(text='''PC Building Toolkit''')
 
-        
         self.P1B1 = Button(self.Page1)
         self.P1B1.place(relx=0.01, rely=0.35, height=315, width=1876)
         self.P1B1.configure(text='''Build a PC!''')
@@ -83,8 +82,12 @@ class TopWindow:
         self.P1B2 = Button(self.Page1)
         self.P1B2.place(relx=0.01, rely=0.72, height=85, width=1876)
         self.P1B2.configure(text='''Build a PC - Advanced Mode''')
-        self.P1B2.configure(command = lambda : [self.AllTabs.select(self.Page2), UserName(self.P1E1.get())])
+        self.P1B2.configure(command = lambda : [self.AllTabs.select(self.Page2), UserName(self.P1E1.get()), AdvancedMode()])
 
+        def AdvancedMode():
+            global AdvancedMode
+            AdvancedMode = True     #Turns boolean True
+            
         self.P1L2 = ttk.Label(self.Page1)
         self.P1L2.place(relx=0.01, rely=0.83, height=139, width=1866)
         self.P1L2.configure(background="#0B0C10")
@@ -195,7 +198,6 @@ This will be used as the file name''')
         self.P3L2.place(relx=0.01, rely=0.18, relheight=0.71, relwidth=0.99)
         self.P3L2.configure(background="#0B0C10")
         self.P3L2.configure(foreground="#c5c6c7")
-##        self.P3L2.configure(justify=LEFT)
         self.P3L2.configure(text='''The list of items will show here''')
         self.P3L2.configure(width=1890)
 
@@ -243,8 +245,15 @@ This will be used as the file name''')
         self.P4B2 = Button(self.Page4)
         self.P4B2.place(relx=0.5, rely=0.93, height=75, width=956)
         self.P4B2.configure(text='''Finish''')
-        self.P4B2.configure(command = lambda : [self.AllTabs.select(self.Page5), BasicMode()])
+        self.P4B2.configure(command = lambda : [self.AllTabs.select(self.Page5), ModeSelection()])
 
+        def ModeSelection():
+            global AdvancedMode
+            if AdvancedMode == True:        #Checks boolean status
+                pass                        #Ignores the check if True
+            else:
+                BasicMode()                 #Else it will run it
+        
         self.P5L1 = Label(self.Page5)
         self.P5L1.place(relx=0.01, rely=0.02, height=211, width=1874)
         self.P5L1.configure(activebackground="#f9f9f9")
@@ -337,78 +346,54 @@ This will be used as the file name''')
         self.P6FB.place(relx=0.02, rely=0.79, height=95, width=1836)
         self.P6FB.configure(text='''Submit''')
         self.P6FB.configure(command = lambda : [self.P6FB.configure(text="Submitted"), Feedback()])
-##        star = 0
+
         def ChooseStar(x):
             global star
-            star = x
+            star = x                                                                #Stores the number of stars provided from button input
             stararray = [self.P6B1,self.P6B2,self.P6B3,self.P6B4,self.P6B5]
-            for i in range(x):
-                stararray[i].configure(background="#FBEB19")                #Yellow
+            for i in range(star):
+                stararray[i].configure(background="#FBEB19")                        #Makes all buttons Yellow
             i+=1
             while True:
-                if i != 5:
-                    stararray[i].configure(background="#0B0C10")
-                    i+=1
+                if i != 5:                                                          #If 5(i) stars is not given
+                    stararray[i].configure(background="#0B0C10")                    #Makes the last star black
+                    i+=1                                                            
                 else:
-                    break
+                    break                                                           #Continues till only the clicked stars and previous are yellow
 
         def Feedback():
-            Comment = self.P6E1.get()
+            Comment = self.P6E1.get()                                               #Fetches the feedback from the entry box
             db = sqlite3.connect("Customers.db")
             cursor = db.cursor()
             try:
                 cursor.execute("""CREATE TABLE {}Feedback (id INTEGER PRIMARY KEY, Stars TEXT, Comment TEXT)""".format(UserNameV))
-
+                                                                                    #Inserts the comment and number of stars to the database
                 cursor.execute("""INSERT INTO """+UserNameV+"""Feedback (Stars, Comment) Values (?,?)""",(star,Comment))
                 db.commit()
-                print(pandas.read_sql_query("SELECT * FROM "+UserNameV+"Feedback", db))
+                print(pandas.read_sql_query("SELECT * FROM "+UserNameV+"Feedback", db))     
                 db.close()
-            except (sqlite3.OperationalError, UnboundLocalError):
+            except (sqlite3.OperationalError, UnboundLocalError):                   #If an error occurs..
                 tkMessageBox.showerror("File Name Error", "A file with this name may already exists or this may contain special characters. Please enter another name and try again.")
-                self.AllTabs.select(self.Page1)
+                self.AllTabs.select(self.Page1)                                     #Asks the user to try another name
 
 
 
+        ButtonsToTheme = [self.P1B1,self.P1B2,self.P2BB,self.P2B1,self.P2B2,self.P2B3,self.P2B4,
+                          self.P2B5,self.P2B6,self.P2B7,self.P2FB,self.P3BB,self.P3FB,self.P4BB,
+                          self.P4B1,self.P4B2,self.P5BB,self.P5B1,self.P5B2,self.P5BB,self.P6BB,
+                          self.P6B1,self.P6B2,self.P6B3,self.P6B4,self.P6B5,self.P6FB]
 
-
-
-        theme(self.P1B1)
-        theme(self.P1B2)
-        theme(self.P2BB)
-        theme(self.P2B1)
-        theme(self.P2B2)
-        theme(self.P2B3)
-        theme(self.P2B4)
-        theme(self.P2B5)
-        theme(self.P2B6)
-        theme(self.P2B7)
-        theme(self.P2FB)
-        theme(self.P3BB)
-        theme(self.P3FB)
-        theme(self.P4BB)
-        theme(self.P4B1)
-        theme(self.P4B2)
-        theme(self.P5BB)
-        theme(self.P5B1)
-        theme(self.P5B2)
-        theme(self.P5BB)
-        theme(self.P6BB)
-        theme(self.P6B1)
-        theme(self.P6B2)
-        theme(self.P6B3)
-        theme(self.P6B4)
-        theme(self.P6B5)
-        theme(self.P6FB)
-        
-        def UserName(UserName):
+        for i in ButtonsToTheme:                    #For all of the buttons in the array
+            theme(i)                                #Theme them
+       
+        def UserName(UserName):                     #Passing by reference
             global UserNameV
             UserNameV=UserName
             while True:
-                for i in range(6):
-                    print(UserChoices[i][1])
-                    if UserChoices[i][1] != "":
+                for i in range(6):                  #If the file name is taken
+                    if UserChoices[i][1] != "":     #and a build has been created
                         break
-                self.AllTabs.select(self.Page5)
+                self.AllTabs.select(self.Page5)     #Show final build page
                 break
                     
                 
@@ -417,46 +402,45 @@ This will be used as the file name''')
         ComponentChoice = ["","","","","","",""]
         ComponentList = ["CPU","Motherboard","Memory","Storage","VideoCard","PowerSupply","Tower"]
 
-
         def ItemSelection(ComponentInput):
             global ComponentInputV
             ComponentInputV = ComponentInput
-            self.P3L1.configure(text=ComponentList[ComponentInput-1])
+            self.P3L1.configure(text=ComponentList[ComponentInput-1])               #To meet stakeholder requirements,
+                                                                                    #Shows category name as title
             Database = sqlite3.connect("Components2.db")    
             cursor = Database.cursor()
-            cursor.execute('''SELECT * FROM ''' + ComponentList[ComponentInput-1])
-            x = []
-            y=""
+            cursor.execute('''SELECT * FROM ''' + ComponentList[ComponentInput-1])  #Fetches all components from category
+            x = []                                                                  #empty array
+            y=""                                                                    #empty string
             
             for column in cursor.execute("SELECT * FROM {}".format(ComponentList[ComponentInput-1])).description:
-                x.append(column[0])
-            
-            
-            for row in cursor:
-                x.extend(row)
-            for i in x:
-                if isinstance(i,int) == True:
-                    print("")
-                    y=y+"\n\n"                        #Adds new row
-                print("{:<25s}".format(str(i)),end="")
-                y=y+"{:<40s}".format(str(i))
-                
-            print("\n")
-            y=y+"\n"
-            print(y)
-            self.P3L2.configure(text=y)
+                                                                                    #Gets table headings...
+                x.append(column[0])                                                 #Stores them in array x
+            for row in cursor:                                                      
+                x.extend(row)                                                       #Adds all components to array
+            for i in x:                                                             #This is to format the text correctly
+                if isinstance(i,int) == True:                                       #When the index is the id as int,
+                    print("")                                                       #Prints a new row, for diagnostics
+                    y=y+"\n\n"                                                      #Adds a new row to the string
+                print("{:<25s}".format(str(i)),end="")                              #The sting will be 25 characters
+                                                                                    #Left aligned, not printing a new line
+                y=y+"{:<40s}".format(str(i))                                        #Adds to string, left aligned 40 char
+            print("\n")                                                             #New line
+            y=y+"\n"                                                                #New Line
+            print(y)                                                                #For diagnostics/monitoring
+            self.P3L2.configure(text=y)                                             #Prints on label
                 
         
-        def ItemSave(ItemChoice):
-            Database = sqlite3.connect("components2.db")    
+        def ItemSave(ItemChoice):                                                   
+            Database = sqlite3.connect("components2.db")                            
             cursor = Database.cursor()
             cursor.execute('''SELECT id FROM '''+ ComponentList[int(ComponentInputV)-1] + ''' WHERE id = ''' + ItemChoice)
-            Check = cursor.fetchall()
+            Check = cursor.fetchall()                                               #Fetches chosen component from database
             print("----------------------------------------------------------------------------------------------------")
             if Check == []:
-                print("***Please enter a valid id***")
+                print("***Please enter a valid id***")                              #If that id is not there (so incorrect input)
             else:
-                ComponentChoice[ComponentInputV-1] = ItemChoice
+                ComponentChoice[ComponentInputV-1] = ItemChoice                     #Saves the component
 
 
       
@@ -466,10 +450,9 @@ This will be used as the file name''')
             global UserChoices
             Database = sqlite3.connect("components2.db")
             cursor = Database.cursor()
-            cursor.execute
 
-            loops = 0    
-            UserChoices = [["CPU",""],
+            loops = 0                                                       #loops variable for number of loops
+            UserChoices = [["CPU",""],                                      #2d arrays store component category and component for export
                            ["Motherboard",""],
                            ["Memory",""],
                            ["Storage",""],
@@ -478,16 +461,16 @@ This will be used as the file name''')
                            ["Case",""]
                            ]
 
-            for position in ComponentChoice:
-                while loops <= 7:
+            for position in ComponentChoice:                #For each component category
+                while loops <= 7:                           #while loops is less than or equal to 7
                     try:
                         cursor.execute('SELECT Name FROM ' + ComponentList[loops-1] + ' WHERE id = {}'.format(ComponentChoice[loops-1]))
-                        for row in cursor:
-                            ItemText = row[0]
-                    except sqlite3.OperationalError:
-                        ItemText = 0
-                    UserChoices[loops-1][1] = ItemText
-                    loops = loops + 1
+                        for row in cursor:                  #Gets the name of each component to save in the builds database
+                            ItemText = row[0]               #[0] saves the component name without brackets
+                    except sqlite3.OperationalError:        #If there is an error
+                        ItemText = 0                        #Set the component to 0, meaning not choosen
+                    UserChoices[loops-1][1] = ItemText      #Set this component to the corresponding index in the 2d array
+                    loops = loops + 1                       #Manually increment loop
             
             table = """
 
@@ -505,48 +488,47 @@ This will be used as the file name''')
 
 """.format(UserChoices[0][1],UserChoices[1][1],UserChoices[2][1],UserChoices[3][1],UserChoices[4][1],UserChoices[5][1],UserChoices[6][1])
             self.P4L1.configure(text=table,justify = LEFT)
-            self.P5L2.configure(text=table,justify = LEFT)
+            self.P5L2.configure(text=table,justify = LEFT)              #Displays table
 
         def Export():
             global UserNameV
             global UserChoices
-            file = open(UserNameV+".txt","w+")
-            file.write(table)
-            file.close()
-            
-            db = sqlite3.connect("Customers.db")
+            file = open(UserNameV+".txt","w+")                      #Will create or ammend the file
+            file.write(table)                                       #Writes the contents of variable table to the file
+            file.close()                                            #Closes file to prevent data corruption
+                
+            db = sqlite3.connect("Customers.db")                    #Connects to customers builds database
             cursor = db.cursor()
             try:
-                cursor.execute("""CREATE TABLE {} (id INTEGER PRIMARY KEY, Component TEXT, Name TEXT)""".format(UserNameV))
-                cursor.executemany("""INSERT INTO """+UserNameV+""" Values (NULL,?,?)""",UserChoices)
+                cursor.execute("""CREATE TABLE {} (id INTEGER PRIMARY KEY, Component TEXT, Name TEXT)""".format(UserNameV))     #Creates table
+                cursor.executemany("""INSERT INTO """+UserNameV+""" Values (NULL,?,?)""",UserChoices)                           #Saves build to database
                 db.commit()
                 cursor.execute('''SELECT * FROM ''' +UserNameV)
                 print("Saved")
-                print(pandas.read_sql_query("SELECT * FROM "+UserNameV, db, "id")) 
-                self.P4L1.configure(text=pandas.read_sql_query("SELECT * FROM "+UserNameV, db, "id"))
+                print(pandas.read_sql_query("SELECT * FROM "+UserNameV, db, "id"))                      
+                self.P4L1.configure(text=pandas.read_sql_query("SELECT * FROM "+UserNameV, db, "id"))                           #Displays current build 
                 db.close()
-            except(sqlite3.OperationalError, UnboundLocalError):
+            except(sqlite3.OperationalError, UnboundLocalError):                                                                #If an error occurs.
                 tkMessageBox.showerror("File Name Error", "A file with this name may already exists or this may contain special characters. Please enter another name and try again.")
-                self.AllTabs.select(self.Page1)
+                self.AllTabs.select(self.Page1)                                                                                 #Asks the user to try another file name and try again
 
    
         def BasicMode():
-
             Database = sqlite3.connect("components2.db")    
             cursor = Database.cursor()
-            if ComponentChoice[0] and ComponentChoice[1] != "":
+            if ComponentChoice[0] and ComponentChoice[1] != "":                                                                                 #If a CPU and Motherboard have been selected...
                 print("Checking socket compatibilty.")
-                CPUCheck = cursor.execute('''SELECT Socket FROM CPU WHERE id = ''' + ComponentChoice[0]).fetchall()
-                MotherboardCheck = cursor.execute('''SELECT Socket FROM Motherboard WHERE id = ''' + ComponentChoice[1]).fetchall()
-                if CPUCheck == MotherboardCheck:
+                CPUCheck = cursor.execute('''SELECT Socket FROM CPU WHERE id = ''' + ComponentChoice[0]).fetchall()                             #Save CPU socket
+                MotherboardCheck = cursor.execute('''SELECT Socket FROM Motherboard WHERE id = ''' + ComponentChoice[1]).fetchall()             #Save Mobo socket
+                if CPUCheck == MotherboardCheck:                                                                                                #If the socket is the same, continue
                     print("Socket is Compatible.")
                 else:
                     print("The socket is not compatible. Please choose another CPU or Motherboard.")
-                    tkMessageBox.showerror("Compatibility Checker", "The socket is not compatible. Please choose another CPU or Motherboard.")
-                    self.AllTabs.select(self.Page2)
+                    tkMessageBox.showerror("Compatibility Checker", "The socket is not compatible. Please choose another CPU or Motherboard.")  #Pop up box error
+                    self.AllTabs.select(self.Page2)                                                                                             #Goes to page that needs to be fixed
             else:
                 print("Socket Compatibility check not required.")
-            if ComponentChoice[1] and ComponentChoice[5] != "":
+            if ComponentChoice[1] and ComponentChoice[5] != "":                                                                                 #Motherboard and Power Supply
                 print("Checking form factor compatibilty.")
                 MotherboardCheck = cursor.execute('''SELECT FormFactor FROM Motherboard WHERE id = ''' + ComponentChoice[1]).fetchall()
                 PowerSupplyCheck = cursor.execute('''SELECT FormFactor FROM PowerSupply WHERE id = ''' + ComponentChoice[5]).fetchall()
@@ -558,7 +540,7 @@ This will be used as the file name''')
                     self.AllTabs.select(self.Page2)
             else:
                 print("Form Factor Compatibility check not required-1")
-            if ComponentChoice[5] and ComponentChoice[6]!= "":
+            if ComponentChoice[5] and ComponentChoice[6]!= "":                                                                                  #Power Supply and Case
                 print("Checking form factor compatibilty.")
                 PowerSupplyCheck = cursor.execute('''SELECT FormFactor FROM PowerSupply WHERE id = ''' + ComponentChoice[5]).fetchall()
                 TowerCheck = cursor.execute('''SELECT FormFactor FROM Tower WHERE id = ''' + ComponentChoice[6]).fetchall()
@@ -570,7 +552,7 @@ This will be used as the file name''')
                     self.AllTabs.select(self.Page2)
             else:
                 print("Form Factor Compatibility check not required-2")
-            if ComponentChoice[1] and ComponentChoice[6]!= "":
+            if ComponentChoice[1] and ComponentChoice[6]!= "":                                                                                  #Motherboard and Case
                 print("Checking form factor compatibilty.")
                 MotherboardCheck = cursor.execute('''SELECT FormFactor FROM Motherboard WHERE id = ''' + ComponentChoice[1]).fetchall()
                 TowerCheck = cursor.execute('''SELECT FormFactor FROM Tower WHERE id = ''' + ComponentChoice[6]).fetchall()
